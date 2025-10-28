@@ -1,0 +1,1 @@
+gcc termi_ds_final.c dsa_common.c dsa_unit1_lists.c dsa_unit2_stackqueue.c dsa_unit3_trees.c dsa_unit4_searchsort.c dsa_unit5_graphs.c -Wall -g -o termi_ds.exe
