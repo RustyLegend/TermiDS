@@ -1,12 +1,9 @@
 #ifndef DSA_COMMON_H
 #define DSA_COMMON_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include<math.h>
-
-// Utility function prototypes
 void _clear_screen();
 void clear_input_buffer();
 void _press_enter_to_continue();
@@ -23,4 +20,4 @@ struct BST_Node {
 };
 struct BST_Node* g_tree_free(struct BST_Node *root);
 void g_tree_print_ascii(struct BST_Node* root);
-#endif // DSA_COMMON_H
+#endif

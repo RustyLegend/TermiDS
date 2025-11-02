@@ -2,9 +2,6 @@
 #include "dsa_common.h"
 #include <math.h>
 
-// --- BST Helper Functions ---
-
-// Create a new BST node
 struct BST_Node* bst_create_node(int data) {
     struct BST_Node *newNode = (struct BST_Node*) malloc(sizeof(struct BST_Node));
     if (newNode == NULL) {
@@ -17,14 +14,11 @@ struct BST_Node* bst_create_node(int data) {
     return newNode;
 }
 
-// Insert a node into the BST
 struct BST_Node* bst_insert(struct BST_Node *root, int data) {
-    // Base case: If the tree is empty, return a new node
     if (root == NULL) {
         return bst_create_node(data);
     }
     
-    // Recursive step
     if (data < root->data) {
         root->left = bst_insert(root->left, data);
     } else if (data > root->data) {
@@ -35,7 +29,6 @@ struct BST_Node* bst_insert(struct BST_Node *root, int data) {
     return root;
 }
 
-// Inorder Traversal (L-N-R)
 void bst_inorder_traversal(struct BST_Node *root) {
     if (root != NULL) {
         bst_inorder_traversal(root->left);
@@ -44,7 +37,6 @@ void bst_inorder_traversal(struct BST_Node *root) {
     }
 }
 
-// Preorder Traversal (N-L-R)
 void bst_preorder_traversal(struct BST_Node *root) {
     if (root != NULL) {
         printf("%d ", root->data);
@@ -53,7 +45,6 @@ void bst_preorder_traversal(struct BST_Node *root) {
     }
 }
 
-// Postorder Traversal (L-R-N)
 void bst_postorder_traversal(struct BST_Node *root) {
     if (root != NULL) {
         bst_postorder_traversal(root->left);
@@ -62,7 +53,6 @@ void bst_postorder_traversal(struct BST_Node *root) {
     }
 }
 
-// Free the entire tree
 struct BST_Node* bst_free_tree(struct BST_Node *root) {
     if (root == NULL) return NULL;
     
@@ -72,23 +62,8 @@ struct BST_Node* bst_free_tree(struct BST_Node *root) {
     return NULL;
 }
 
-
-// --- Main Topic Functions (Called by Dispatcher) ---
-
-// (This code goes into dsa_unit3_trees.c)
-// ... (The BST helper functions like bst_create_node are already here) ...
-
-// ====================================================================
-// --- 1. Static Helper Functions for General Binary Tree (BT) ---
-// ====================================================================
-// We reuse the 'struct BST_Node' but name the functions 'bt_'
-// to keep them logically separate from 'bst_'.
-
 #define BT_PRINT_SPACE 10
 
-/**
- * @brief (BT) Creates a new tree node.
- */
 static struct BST_Node* bt_create_node(int data) {
     struct BST_Node *newNode = (struct BST_Node*) malloc(sizeof(struct BST_Node));
     if (newNode == NULL) {
@@ -101,9 +76,6 @@ static struct BST_Node* bt_create_node(int data) {
     return newNode;
 }
 
-/**
- * @brief (BT) Frees all memory used by the tree.
- */
 static struct BST_Node* bt_free_tree(struct BST_Node *root) {
     if (root == NULL) return NULL;
     bt_free_tree(root->left);
@@ -112,9 +84,6 @@ static struct BST_Node* bt_free_tree(struct BST_Node *root) {
     return NULL;
 }
 
-/**
- * @brief (BT) Traversal helper: Inorder (LNR)
- */
 static void bt_inorder_traversal(struct BST_Node *root) {
     if (root != NULL) {
         bt_inorder_traversal(root->left);
@@ -123,9 +92,6 @@ static void bt_inorder_traversal(struct BST_Node *root) {
     }
 }
 
-/**
- * @brief (BT) Traversal helper: Preorder (NLR)
- */
 static void bt_preorder_traversal(struct BST_Node *root) {
     if (root != NULL) {
         printf("%d ", root->data);
@@ -134,9 +100,6 @@ static void bt_preorder_traversal(struct BST_Node *root) {
     }
 }
 
-/**
- * @brief (BT) Traversal helper: Postorder (LRN)
- */
 static void bt_postorder_traversal(struct BST_Node *root) {
     if (root != NULL) {
         bt_postorder_traversal(root->left);
@@ -145,9 +108,6 @@ static void bt_postorder_traversal(struct BST_Node *root) {
     }
 }
 
-/**
- * @brief (BT) Finds a node with a specific value (preorder search).
- */
 static struct BST_Node* bt_find_node(struct BST_Node* root, int data) {
     if (root == NULL) {
         return NULL;
@@ -155,26 +115,13 @@ static struct BST_Node* bt_find_node(struct BST_Node* root, int data) {
     if (root->data == data) {
         return root;
     }
-    // Search left subtree
     struct BST_Node* foundNode = bt_find_node(root->left, data);
     if (foundNode != NULL) {
         return foundNode;
     }
-    // Search right subtree
     return bt_find_node(root->right, data);
 }
 
-
-// (This code goes into dsa_unit3_trees.c)
-
-/**
- * @brief (BT) [NEW] Helper to get the height of the tree.
- */
-
-
-/**
- * @brief (BT) The UI logic for adding a new child node.
- */
 static void bt_insert_child(struct BST_Node* root) {
     int parentData, childData;
     char choice;
@@ -221,15 +168,6 @@ static void bt_insert_child(struct BST_Node* root) {
     }
 }
 
-
-// ====================================================================
-// --- 2. Main Binary Tree Topic Function ---
-// ====================================================================
-
-/**
- * @brief Topic 1: General Binary Tree
- * This is the main function called by the dispatcher.
- */
 void dsa_binary_tree() {
     struct BST_Node *root = NULL;
     int choice, data;
@@ -301,7 +239,7 @@ void dsa_binary_tree() {
                 break;
                 
             case 5:
-                root = g_tree_free(root); // Cleanup
+                root = g_tree_free(root);
                 printf("Binary Tree memory freed.\n");
                 return;
                 
@@ -311,10 +249,6 @@ void dsa_binary_tree() {
         }
     } while (choice != 5);
 }
-
-
-// ... (The rest of your dsa_unit3_trees.c file,
-// e.g., dsa_bst_operations, dsa_expression_tree, etc.)
 
 void dsa_bst_operations() {
     struct BST_Node *root = NULL;
@@ -367,7 +301,7 @@ void dsa_bst_operations() {
                 _press_enter_to_continue();
                 break;
             case 5:
-                root = g_tree_free(root); // Cleanup
+                root = g_tree_free(root);
                 printf("BST memory freed.\n");
                 return;
             default:
@@ -377,14 +311,6 @@ void dsa_bst_operations() {
     } while (choice != 5);
 }
 
-// (This code goes into dsa_unit3_trees.c)
-// ... (All the Binary Tree and BST code is here) ...
-
-// ====================================================================
-// --- 3. Static Helpers for Expression Tree (ET) ---
-// ====================================================================
-
-// --- Stack for ET_Node pointers ---
 #define ET_STACK_SIZE 100
 static struct ET_Node* g_et_stack[ET_STACK_SIZE];
 static int g_et_top = -1;
@@ -403,14 +329,9 @@ static struct ET_Node* et_pop() {
     if (!et_stack_is_empty()) {
         return g_et_stack[g_et_top--];
     }
-    return NULL; // Error/empty
+    return NULL;
 }
 
-// --- ET Helper Functions ---
-
-/**
- * @brief (ET) Creates a new expression tree node.
- */
 static struct ET_Node* et_create_node(char value) {
     struct ET_Node *newNode = (struct ET_Node*) malloc(sizeof(struct ET_Node));
     if (newNode == NULL) {
@@ -423,16 +344,10 @@ static struct ET_Node* et_create_node(char value) {
     return newNode;
 }
 
-/**
- * @brief (ET) Checks if a character is an operator.
- */
 static int et_is_operator(char ch) {
     return (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^');
 }
 
-/**
- * @brief (ET) Frees all memory used by the expression tree.
- */
 static struct ET_Node* et_free_tree(struct ET_Node *root) {
     if (root == NULL) return NULL;
     et_free_tree(root->left);
@@ -441,13 +356,8 @@ static struct ET_Node* et_free_tree(struct ET_Node *root) {
     return NULL;
 }
 
-/**
- * @brief (ET) Traversal helper: Inorder (LNR)
- * This traversal *recreates* the original infix expression (with parentheses).
- */
 static void et_inorder_traversal(struct ET_Node *root) {
     if (root != NULL) {
-        // If the child is an operator, add parentheses
         if (et_is_operator(root->value) && root->left != NULL) {
             printf("(");
         }
@@ -462,9 +372,6 @@ static void et_inorder_traversal(struct ET_Node *root) {
     }
 }
 
-/**
- * @brief (ET) Traversal helper: Preorder (NLR) - (Polish Notation)
- */
 static void et_preorder_traversal(struct ET_Node *root) {
     if (root != NULL) {
         printf("%c ", root->value);
@@ -473,9 +380,6 @@ static void et_preorder_traversal(struct ET_Node *root) {
     }
 }
 
-/**
- * @brief (ET) Traversal helper: Postorder (LRN) - (Original Postfix)
- */
 static void et_postorder_traversal(struct ET_Node *root) {
     if (root != NULL) {
         et_postorder_traversal(root->left);
@@ -483,8 +387,6 @@ static void et_postorder_traversal(struct ET_Node *root) {
         printf("%c ", root->value);
     }
 }
-
-// --- ASCII 2D Print Functions (adapted for ET_Node) ---
 
 static int et_get_height(struct ET_Node* root) {
     if (root == NULL) {
@@ -504,17 +406,14 @@ static void et_print_ascii_tree_recursive(char** screen, struct ET_Node* root,
     int col_mid = (col_start + col_end) / 2;
     int row = level * 2; 
 
-    // Draw the node's value
     screen[row][col_mid] = root->value;
 
-    // Recurse for left child
     if (root->left != NULL) {
         int line_pos = (col_start + col_mid - 1) / 2;
         screen[row + 1][line_pos] = '/';
         et_print_ascii_tree_recursive(screen, root->left, level + 1, col_start, col_mid - 1);
     }
     
-    // Recurse for right child
     if (root->right != NULL) {
         int line_pos = (col_mid + 1 + col_end) / 2;
         screen[row + 1][line_pos] = '\\';
@@ -557,19 +456,12 @@ static void et_print_ascii_tree(struct ET_Node* root) {
     printf("------------------------------\n");
 }
 
-
-// --- Main Topic Function (Called by Dispatcher) ---
-
-/**
- * @brief Topic 3: Expression Tree
- * This is the main function called by the dispatcher.
- */
 void dsa_expression_tree() {
     char postfix[ET_STACK_SIZE];
     struct ET_Node *root = NULL;
     int i;
     
-    et_stack_init(); // Reset the ET_Node stack
+    et_stack_init();
     
     _clear_screen();
     printf("==========================================\n");
@@ -583,31 +475,27 @@ void dsa_expression_tree() {
     
     printf("\n--- Building Tree from: %s ---\n", postfix);
 
-    // --- The Build Algorithm ---
     for (i = 0; postfix[i] != '\0'; i++) {
         char ch = postfix[i];
         printf("Reading: '%c'\n", ch);
         
-        // Case 1: Operand
         if (!et_is_operator(ch)) {
             struct ET_Node *newNode = et_create_node(ch);
             et_push(newNode);
             printf("  Action: Operand. Pushed node '%c' to stack.\n", ch);
         }
-        // Case 2: Operator
         else {
             struct ET_Node *newNode = et_create_node(ch);
             printf("  Action: Operator. Pushing node '%c' to stack.\n", ch);
             
-            // Pop two operands
             newNode->right = et_pop();
             newNode->left = et_pop();
             
             if(newNode->left == NULL || newNode->right == NULL) {
                 printf("  ERROR: Malformed expression! (Not enough operands for '%c')\n", ch);
-                root = et_free_tree(root); // Free partial tree
+                root = et_free_tree(root);
                 et_free_tree(newNode);
-                goto cleanup; // Jump to end
+                goto cleanup;
             }
             
             printf("  Popped '%c' (set as left child).\n", newNode->left->value);
@@ -617,21 +505,18 @@ void dsa_expression_tree() {
         }
     }
     
-    // After loop, the stack should have exactly one item: the root
     root = et_pop();
     if (!et_stack_is_empty()) {
         printf("ERROR: Malformed expression! (Too many operands)\n");
-        root = et_free_tree(root); // Free the root we popped
-        // Free everything else on the stack
+        root = et_free_tree(root);
         while(!et_stack_is_empty()) {
             et_free_tree(et_pop());
         }
     }
 
-cleanup: // Label to jump to on error
+cleanup:
     printf("\n--- Build Complete ---\n\n");
     
-    // --- Display Results ---
     et_print_ascii_tree(root);
     
     printf("\n--- Traversals ---\n");
@@ -647,6 +532,6 @@ cleanup: // Label to jump to on error
     if (root) et_postorder_traversal(root); else printf("Empty");
     printf("\n");
 
-    if (root) root = et_free_tree(root); // Cleanup
+    if (root) root = et_free_tree(root);
     _press_enter_to_continue();
 }

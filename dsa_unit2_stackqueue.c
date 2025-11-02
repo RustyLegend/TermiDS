@@ -7,16 +7,11 @@ static int g_eval_stack[EVAL_STACK_SIZE];
 static int g_eval_top = -1;
 static char g_infix_stack[INFIX_STACK_SIZE];
 static int g_infix_top = -1;
-static char g_infix_postfix[INFIX_STACK_SIZE]; // To build the string
+static char g_infix_postfix[INFIX_STACK_SIZE];
 static int g_postfix_idx = 0;
 
-// --- Static global instances for these modules ---
-// (Keeps them encapsulated in this file)
 static struct Stack g_stack;
 static struct Queue g_queue;
-
-
-// --- Stack Helper Functions ---
 
 static void eval_stack_init() { g_eval_top = -1; }
 static int eval_stack_is_empty() { return g_eval_top == -1; }
@@ -39,22 +34,18 @@ static int eval_pop() {
     if (!eval_stack_is_empty()) {
         return g_eval_stack[g_eval_top--];
     }
-    return -9999; // Return an error/unlikely value
-
+    return -9999;
 }
 
-/**
- * @brief (EVAL) Helper to print the current state of the int stack.
- */
 static void eval_print_stack() {
     printf("Stack (Top to Bottom):\n");
-    printf("+-------+\n"); // Top border
+    printf("+-------+\n");
 
     if (g_eval_top == -1) {
         printf("| Empty |\n");
     } else {
         for (int i = g_eval_top; i >= 0; i--) {
-            printf("| %5d |", g_eval_stack[i]); // Centered int
+            printf("| %5d |", g_eval_stack[i]);
             if (i == g_eval_top) {
                 printf(" <- TOP\n");
             } else {
@@ -65,7 +56,7 @@ static void eval_print_stack() {
             }
         }
     }
-    printf("+-------+\n"); // Bottom border
+    printf("+-------+\n");
     printf("  BOTTOM\n");
 }
 
@@ -100,33 +91,27 @@ void stack_pop() {
 
 void stack_display() {
     printf("Stack (Size: %d):\n", STACK_SIZE);
-    printf("+-------+\n"); // Top border
+    printf("+-------+\n");
 
     if (g_stack.top == -1) {
         printf("| Empty |\n");
     } else {
-        // Iterate from top down to bottom
         for (int i = g_stack.top; i >= 0; i--) {
-            // Print element centered in a box
             printf("| %5d |", g_stack.items[i]);
-            
-            // Add arrow for the top element
             if (i == g_stack.top) {
                 printf(" <- TOP\n");
             } else {
                 printf("\n");
             }
-            // Print separator, unless it's the last element
             if (i > 0) {
                  printf("+-------+\n");
             }
         }
     }
-    printf("+-------+\n"); // Bottom border
+    printf("+-------+\n");
     printf("  BOTTOM\n");
 }
 
-// --- Queue Helper Functions ---
 void queue_init() {
     g_queue.front = 0;
     g_queue.rear = -1;
@@ -176,21 +161,6 @@ void queue_display() {
     printf("REAR\n");
 }
 
-
-// --- Main Topic Functions (Called by Dispatcher) ---
-
-// (This code goes into dsa_unit2_stackqueue.c)
-// ... (include "dsa_common.h" is already at the top) ...
-// ... (all the stack/queue code is here) ...
-
-
-// ====================================================================
-// --- 1. Count Sort Implementation & Visualization ---
-// ====================================================================
-
-/**
- * @brief (COUNT SORT) The main demo function.
- */
 static void dsa_count_sort_visual() {
     _clear_screen();
     printf("==========================================\n");
@@ -200,7 +170,7 @@ static void dsa_count_sort_visual() {
     printf("non-negative integers. (e.g., 0-99)\n\n");
     
     int n;
-    int* arr = get_positive_array(&n); // Get array (positive only)
+    int* arr = get_positive_array(&n);
     if (arr == NULL) {
         _press_enter_to_continue();
         return;
@@ -212,7 +182,6 @@ static void dsa_count_sort_visual() {
     int max = get_max(arr, n);
     int range = max + 1;
     
-    // Allocate count and output arrays
     int* count = (int*) calloc(range, sizeof(int));
     int* output = (int*) malloc(n * sizeof(int));
     
@@ -225,7 +194,6 @@ static void dsa_count_sort_visual() {
         return;
     }
 
-    // --- STEP 1: Store frequencies ---
     printf("\n--- Step 1: Frequency Array (size %d) ---\n", range);
     for (int i = 0; i < n; i++) {
         count[arr[i]]++;
@@ -233,7 +201,6 @@ static void dsa_count_sort_visual() {
     print_array(count, range);
     _press_enter_to_continue();
 
-    // --- STEP 2: Store cumulative positions ---
     printf("\n--- Step 2: Cumulative Position Array ---\n");
     for (int i = 1; i < range; i++) {
         count[i] += count[i - 1];
@@ -241,7 +208,6 @@ static void dsa_count_sort_visual() {
     print_array(count, range);
     _press_enter_to_continue();
     
-    // --- STEP 3: Build the output array ---
     printf("\n--- Step 3: Building Output Array ---\n");
     printf("Iterating input array *backwards*...\n");
     for (int i = n - 1; i >= 0; i--) {
@@ -253,50 +219,36 @@ static void dsa_count_sort_visual() {
     }
     _press_enter_to_continue();
 
-    // --- STEP 4: Copy sorted array back ---
     printf("\n--- Final Result ---\n");
     for (int i = 0; i < n; i++) {
         arr[i] = output[i];
     }
     print_array(arr, n);
 
-    // Free all memory
     free(arr);
     free(count);
     free(output);
     _press_enter_to_continue();
 }
 
-
-// ====================================================================
-// --- 2. Radix Sort Implementation & Visualization ---
-// ====================================================================
-
-/**
- * @brief (RADIX) A stable Count Sort sub-routine for Radix Sort.
- * Sorts based on a specific digit (exp).
- */
 static void radix_count_sort(int arr[], int n, int exp) {
     int* output = (int*) malloc(n * sizeof(int));
-    int count[10] = {0}; // Digits 0-9
+    int count[10] = {0};
     
     if (output == NULL) {
         printf("Memory allocation failed!\n");
         return;
     }
 
-    // 1. Store frequencies of digits (0-9)
     for (int i = 0; i < n; i++) {
         int digit = (arr[i] / exp) % 10;
         count[digit]++;
     }
 
-    // 2. Store cumulative positions
     for (int i = 1; i < 10; i++) {
         count[i] += count[i - 1];
     }
 
-    // 3. Build output array (backward)
     for (int i = n - 1; i >= 0; i--) {
         int digit = (arr[i] / exp) % 10;
         int pos = count[digit] - 1;
@@ -304,7 +256,6 @@ static void radix_count_sort(int arr[], int n, int exp) {
         count[digit]--;
     }
 
-    // 4. Copy back to original array
     for (int i = 0; i < n; i++) {
         arr[i] = output[i];
     }
@@ -312,9 +263,6 @@ static void radix_count_sort(int arr[], int n, int exp) {
     free(output);
 }
 
-/**
- * @brief (RADIX) The main demo function.
- */
 static void dsa_radix_sort_visual() {
     _clear_screen();
     printf("==========================================\n");
@@ -324,7 +272,7 @@ static void dsa_radix_sort_visual() {
     printf("using a stable sort (like Count Sort).\n\n");
 
     int n;
-    int* arr = get_positive_array(&n); // Get array (positive only)
+    int* arr = get_positive_array(&n);
     if (arr == NULL) {
         _press_enter_to_continue();
         return;
@@ -336,11 +284,10 @@ static void dsa_radix_sort_visual() {
 
     int max = get_max(arr, n);
     
-    // Loop for every digit place (exp = 1s, 10s, 100s, ...)
     for (int exp = 1; max / exp > 0; exp *= 10) {
         printf("\n--- Sorting on Digit (Place = %d) ---\n", exp);
         radix_count_sort(arr, n, exp);
-        print_array(arr, n); // Show the intermediate array!
+        print_array(arr, n);
         _press_enter_to_continue();
     }
 
@@ -351,15 +298,6 @@ static void dsa_radix_sort_visual() {
     _press_enter_to_continue();
 }
 
-
-// ====================================================================
-// --- 3. Main Topic Menu ---
-// ====================================================================
-
-/**
- * @brief Topic 1: Count Sort and Radix Sort (Main Menu)
- * This is the main function called by the dispatcher.
- */
 void dsa_count_radix_sort() {
     int choice;
     do {
@@ -396,7 +334,7 @@ void dsa_count_radix_sort() {
 
 void dsa_stack_operations() {
     int choice;
-    stack_init(); // Initialize the stack
+    stack_init();
 
     do {
         _clear_screen();
@@ -427,7 +365,7 @@ void dsa_stack_operations() {
 
 void dsa_queue_operations() {
     int choice;
-    queue_init(); // Initialize the queue
+    queue_init();
 
     do {
         _clear_screen();
@@ -459,7 +397,7 @@ void dsa_queue_operations() {
 static void infix_stack_init() { 
     g_infix_top = -1; 
     g_postfix_idx = 0;
-    g_infix_postfix[0] = '\0'; // Start with an empty string
+    g_infix_postfix[0] = '\0';
 }
 
 static int infix_stack_is_empty() { return g_infix_top == -1; }
@@ -475,7 +413,7 @@ static char infix_pop() {
     if (!infix_stack_is_empty()) {
         return g_infix_stack[g_infix_top--];
     }
-    return '\0'; // Error/empty
+    return '\0';
 }
     
 static char infix_peek() {
@@ -485,42 +423,33 @@ static char infix_peek() {
     return '\0';
 }
 
-/**
- * @brief (INFIX) Checks if a character is an operand (letter or digit).
- */
 static int is_operand(char ch) {
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
 }
 
-/**
- * @brief (INFIX) Returns the precedence of an operator.
- */
 static int precedence(char op) {
     switch (op) {
         case '+':
         case '-':
-            return 1; // Low precedence
+            return 1;
         case '*':
         case '/':
-            return 2; // Medium precedence
+            return 2;
         case '^':
-            return 3; // High precedence
+            return 3;
     }
-    return 0; // For '(' and other chars
+    return 0;
 }
 
-/**
- * @brief (INFIX) Helper to print the current state of the stack.
- */
 static void infix_print_stack() {
     printf("Stack (Top to Bottom):\n");
-    printf("+-----+\n"); // Top border
+    printf("+-----+\n");
 
     if (g_infix_top == -1) {
         printf("|Empty|\n");
     } else {
         for (int i = g_infix_top; i >= 0; i--) {
-            printf("|  %c  |", g_infix_stack[i]); // Centered char
+            printf("|  %c  |", g_infix_stack[i]);
             if (i == g_infix_top) {
                 printf(" <- TOP\n");
             } else {
@@ -531,30 +460,21 @@ static void infix_print_stack() {
             }
         }
     }
-    printf("+-----+\n"); // Bottom border
+    printf("+-----+\n");
     printf(" BOTTOM\n");
 }
 
-/**
- * @brief (INFIX) Helper to append to postfix string and print it.
- */
 static void infix_append_postfix(char ch) {
     g_infix_postfix[g_postfix_idx++] = ch;
-    g_infix_postfix[g_postfix_idx] = '\0'; // Keep it null-terminated
+    g_infix_postfix[g_postfix_idx] = '\0';
     printf("Postfix: %s\n", g_infix_postfix);
 }
 
-// --- Main Topic Function (Called by Dispatcher) ---
-
-/**
- * @brief Topic 4: Infix to Postfix Conversion
- * This is the main function called by the dispatcher.
- */
 void dsa_infix_to_postfix() {
     char infix[INFIX_STACK_SIZE];
     int i;
     
-    infix_stack_init(); // Reset the stack and output string
+    infix_stack_init();
     
     _clear_screen();
     printf("==========================================\n");
@@ -575,17 +495,14 @@ void dsa_infix_to_postfix() {
         printf("------------------------------------------\n");
         printf("Reading: '%c'\n", ch);
 
-        // --- Case 1: Operand ---
         if (is_operand(ch)) {
             printf("Action: Is Operand. Append to postfix.\n");
             infix_append_postfix(ch);
         } 
-        // --- Case 2: Opening Parenthesis ---
         else if (ch == '(') {
             printf("Action: Is '('. Push onto stack.\n");
             infix_push(ch);
         }
-        // --- Case 3: Closing Parenthesis ---
         else if (ch == ')') {
             printf("Action: Is ')'. Pop from stack until '(' is found.\n");
             while (!infix_stack_is_empty() && infix_peek() != '(') {
@@ -594,16 +511,13 @@ void dsa_infix_to_postfix() {
                 infix_append_postfix(popped);
             }
             if (!infix_stack_is_empty()) {
-                infix_pop(); // Pop and discard the '('
+                infix_pop();
                 printf("  Popped and discarded '('\n");
             }
         }
-        // --- Case 4: Operator ---
         else { 
             printf("Action: Is Operator.\n");
             
-            // Handle right-associativity for '^' (it's the only one)
-            // We only pop if stack.top > current (not >=)
             if (ch == '^') {
                 while (!infix_stack_is_empty() && infix_peek() != '(' && 
                        precedence(infix_peek()) > precedence(ch)) {
@@ -613,8 +527,6 @@ void dsa_infix_to_postfix() {
                     infix_append_postfix(popped);
                 }
             } 
-            // Handle left-associativity for all other ops
-            // We pop if stack.top >= current
             else {
                 while (!infix_stack_is_empty() && infix_peek() != '(' && 
                        precedence(infix_peek()) >= precedence(ch)) {
@@ -630,7 +542,6 @@ void dsa_infix_to_postfix() {
         infix_print_stack();
     }
     
-    // --- Step 5: End of string, pop all remaining ---
     printf("------------------------------------------\n");
     printf("End of infix string. Popping remaining stack:\n");
     while (!infix_stack_is_empty()) {
@@ -646,24 +557,11 @@ void dsa_infix_to_postfix() {
     _press_enter_to_continue();
 }
 
-// (This code goes into dsa_unit2_stackqueue.c)
-// ... (The dsa_infix_to_postfix function and its static helpers should be above this) ...
-
-// ====================================================================
-// --- 5. String Reversal using Stack Implementation ---
-// ====================================================================
-// We reuse the 'infix_stack' static helpers (infix_stack_init, infix_push, etc.)
-
-/**
- * @brief Topic 5: String Reversal using Stack
- * This is the main function called by the dispatcher.
- */
 void dsa_string_reversal_stack() {
-    char original[INFIX_STACK_SIZE]; // Reuse stack size as max string size
+    char original[INFIX_STACK_SIZE];
     char reversed[INFIX_STACK_SIZE];
     int i = 0;
     
-    // 1. Initialize the stack (critical!)
     infix_stack_init();
     
     _clear_screen();
@@ -677,15 +575,14 @@ void dsa_string_reversal_stack() {
 
     printf("\n--- Phase 1: Pushing to Stack ---\n");
     
-    // 2. Push all characters onto the stack
     for (i = 0; original[i] != '\0'; i++) {
         if (!infix_stack_is_full()) {
             infix_push(original[i]);
             printf("Pushed: '%c'\n", original[i]);
-            infix_print_stack(); // Helper from infix module
+            infix_print_stack();
         } else {
             printf("Stack is full! Cannot push more characters.\n");
-            original[i] = '\0'; // Truncate string
+            original[i] = '\0';
             break;
         }
     }
@@ -695,15 +592,14 @@ void dsa_string_reversal_stack() {
     
     printf("\n--- Phase 2: Popping to build new string ---\n");
 
-    // 3. Pop all characters back into the 'reversed' string
-    i = 0; // Reset index for the new string
+    i = 0;
     while (!infix_stack_is_empty()) {
         char ch = infix_pop();
         reversed[i++] = ch;
         printf("Popped: '%c'\n", ch);
         infix_print_stack();
     }
-    reversed[i] = '\0'; // Add null terminator
+    reversed[i] = '\0';
     
     printf("\n--- Final Result ---\n");
     printf("Original: %s\n", original);
@@ -712,23 +608,11 @@ void dsa_string_reversal_stack() {
     _press_enter_to_continue();
 }
 
-// (This code goes into dsa_unit2_stackqueue.c)
-// ... (The dsa_infix_to_postfix function and its helpers should be here) ...
-
-// ====================================================================
-// --- 6. Postfix Evaluation Implementation ---
-// ====================================================================
-// We use the 'eval_stack' static helpers (eval_push, eval_pop, etc.)
-
-/**
- * @brief Topic 6: Postfix Evaluation
- * This is the main function called by the dispatcher.
- */
 void dsa_postfix_evaluation() {
     char postfix[EVAL_STACK_SIZE];
     int i;
     
-    eval_stack_init(); // Reset the integer stack
+    eval_stack_init();
     
     _clear_screen();
     printf("==========================================\n");
@@ -749,17 +633,14 @@ void dsa_postfix_evaluation() {
         printf("------------------------------------------\n");
         printf("Reading: '%c'\n", ch);
 
-        // --- Case 1: Operand ---
         if (isdigit(ch)) {
-            int val = ch - '0'; // Convert char '5' to int 5
+            int val = ch - '0';
             printf("Action: Is Operand. Pushing %d onto stack.\n", val);
             eval_push(val);
         }
-        // --- Case 2: Operator ---
         else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^') {
             printf("Action: Is Operator.\n");
             
-            // Pop the two operands
             if (eval_stack_is_empty()) {
                 printf("Error: Malformed expression! (Stack empty on op)\n");
                 break;
@@ -783,13 +664,12 @@ void dsa_postfix_evaluation() {
                 case '/': 
                     if (val2 == 0) {
                         printf("Error: Division by zero!\n");
-                        goto cleanup; // Jump out of the loop
+                        goto cleanup;
                     }
                     result = val1 / val2; 
                     break;
                 case '^': 
                     result = 1;
-                    // Simple power for positive exponents
                     for(int j=0; j<val2; j++) result *= val1;
                     break;
             }
@@ -803,19 +683,16 @@ void dsa_postfix_evaluation() {
         eval_print_stack();
     }
 
-cleanup: // Label for division by zero
+cleanup:
     printf("------------------------------------------\n");
     printf("End of expression.\n");
     
-    // --- Final Result ---
     if (!eval_stack_is_empty()) {
         int final_result = eval_pop();
         if (eval_stack_is_empty()) {
-            // This is the correct outcome!
             printf("\n--- Final Result ---\n");
             printf("Result: %d\n", final_result);
         } else {
-            // Too many items left on stack
             printf("\n--- Error ---\n");
             printf("Malformed expression: Too many operands.\n");
             eval_print_stack();
@@ -828,24 +705,11 @@ cleanup: // Label for division by zero
     _press_enter_to_continue();
 }
 
-// (This code goes into dsa_unit2_stackqueue.c)
-// ... (The dsa_postfix_evaluation function and its helpers should be above this) ...
-
-// ====================================================================
-// --- 7. Balancing Symbols Implementation ---
-// ====================================================================
-// We reuse the 'infix_stack' static helpers (infix_stack_init, is_match, etc.)
-
-/**
- * @brief Topic 7: Balancing Symbols
- * This is the main function called by the dispatcher.
- */
 void dsa_balancing_symbols() {
     char expr[INFIX_STACK_SIZE];
     int i;
-    int is_balanced = 1; // Assume balanced until proven otherwise
+    int is_balanced = 1;
 
-    // 1. Initialize the character stack
     infix_stack_init();
     
     _clear_screen();
@@ -861,30 +725,27 @@ void dsa_balancing_symbols() {
     printf("\n--- Starting Check ---\n");
     printf("Expression: %s\n", expr);
 
-    // 2. Loop through the expression
     for (i = 0; expr[i] != '\0'; i++) {
         char ch = expr[i];
         printf("------------------------------------------\n");
         printf("Reading: '%c'\n", ch);
 
-        // --- Case 1: Opening symbol ---
         if (ch == '(' || ch == '[' || ch == '{') {
             printf("Action: Opening symbol. Pushing to stack.\n");
             if (infix_stack_is_full()) {
                 printf("ERROR: Stack is full! Expression is too long.\n");
                 is_balanced = 0;
-                break; // Exit loop
+                break;
             }
             infix_push(ch);
         }
-        // --- Case 2: Closing symbol ---
         else if (ch == ')' || ch == ']' || ch == '}') {
             printf("Action: Closing symbol. Checking for match.\n");
             
             if (infix_stack_is_empty()) {
                 printf("  ERROR: Mismatch! Stack is empty, but found closing '%c'.\n", ch);
                 is_balanced = 0;
-                break; // Exit loop
+                break;
             }
             
             char popped = infix_pop();
@@ -895,35 +756,30 @@ void dsa_balancing_symbols() {
             } else {
                 printf("  ERROR: Mismatch! Popped '%c' does not match closing '%c'.\n", popped, ch);
                 is_balanced = 0;
-                break; // Exit loop
+                break;
             }
         }
-        // --- Case 3: Other character ---
         else {
             printf("Action: Not a symbol. Ignoring.\n");
         }
         
-        infix_print_stack(); // Show stack state after every character
+        infix_print_stack();
     }
     
-    // 3. Final Check (End of string)
     printf("------------------------------------------\n");
     printf("End of expression.\n");
 
-    // Only check the stack if no *other* errors have occurred
     if (is_balanced) {
         if (infix_stack_is_empty()) {
             printf("Final Check: Stack is empty.\n");
             printf("\n--- Final Result: BALANCED ---\n");
         } else {
-            // This is the (a+b error
             printf("Final Check: ERROR! Stack is not empty.\n");
             printf("  Unmatched opening symbols remain on the stack.\n");
             infix_print_stack();
             printf("\n--- Final Result: NOT BALANCED ---\n");
         }
     } else {
-        // This is for mismatches like (a] or )a(
         printf("\n--- Final Result: NOT BALANCED ---\n");
         printf("A mismatch error was detected during the scan.\n");
     }

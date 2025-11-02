@@ -1,8 +1,5 @@
 #include "dsa_common.h"
 
-/**
- * @brief Clears the console screen.
- */
 void _clear_screen() {
     #ifdef _WIN32
         system("cls");
@@ -11,9 +8,6 @@ void _clear_screen() {
     #endif
 }
 
-/**
- * @brief Simulates an initialization and loading sequence.
- */
 void _loading_animation() {
     _clear_screen();
     printf(">> Initializing TermiDS Engine...\n");
@@ -21,26 +15,17 @@ void _loading_animation() {
     printf("Loading content...\n\n");
 }
 
-/**
- * @brief Clears the standard input buffer (e.g., after a scanf).
- */
 void clear_input_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-/**
- * @brief Pauses execution and waits for user to press ENTER.
- */
 void _press_enter_to_continue() {
     printf("------------------------------------------\n");
     printf("Press ENTER to return to the menu...\n");
-    getchar(); // Wait for the ENTER press
+    getchar();
 }
 
-/**
- * @brief Placeholder for not-yet-implemented functions.
- */
 void _display_content_placeholder(const char *topic_name) {
     _clear_screen();
     printf("====================================================\n");
@@ -123,15 +108,6 @@ int get_max(int arr[], int n) {
     return max;
 }
 
-// (This code goes at the BOTTOM of dsa_common.c)
-
-// ==========================================================
-// --- Global Tree Utility Implementations ---
-// ==========================================================
-
-/**
- * @brief (GLOBAL) Frees all memory used by a tree.
- */
 struct BST_Node* g_tree_free(struct BST_Node *root) {
     if (root == NULL) return NULL;
     g_tree_free(root->left);
@@ -140,9 +116,6 @@ struct BST_Node* g_tree_free(struct BST_Node *root) {
     return NULL;
 }
 
-/**
- * @brief (GLOBAL) Helper to get the height of the tree.
- */
 static int g_tree_get_height(struct BST_Node* root) {
     if (root == NULL) {
         return 0;
@@ -152,9 +125,6 @@ static int g_tree_get_height(struct BST_Node* root) {
     return 1 + (left_height > right_height ? left_height : right_height);
 }
 
-/**
- * @brief (GLOBAL) The recursive drawing function.
- */
 static void g_tree_print_ascii_recursive(char** screen, struct BST_Node* root, 
                                           int level, int col_start, int col_end) {
     if (root == NULL || col_start > col_end) {
@@ -187,11 +157,7 @@ static void g_tree_print_ascii_recursive(char** screen, struct BST_Node* root,
     }
 }
 
-/**
- * @brief (GLOBAL) The wrapper for the ASCII tree print.
- */
 void g_tree_print_ascii(struct BST_Node* root) {
-    // This function is now global and can be called from any file.
     printf("--- 2D Tree Representation ---\n");
 
     if (root == NULL) {

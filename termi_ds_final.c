@@ -5,34 +5,24 @@
 #include "dsa_unit4_searchsort.h"
 #include "dsa_unit5_graphs.h"
 
-// --- Constants (Menu Text) ---
 const char *const sessional_topics_map[2][6][10] = {
-    // Sessional 1 (Units 1 & 2)
     {
-        // Unit 1: Introduction to Lists
         {"Array Max/Min", "Single Linked List (All Ops)", "Double Linked List (All Ops)", "Circular Linked List (All Ops)", "Polynomial Linked List Creation", "Polynomial Add/Sub", NULL},
-        // Unit 2: Stacks and Queues
         {"Count Sort and Radix Sort", "Stack Operations", "Queue Operations", "Infix to Postfix Conversion", "String Reversal using Stack", "Postfix Evaluation", "Balancing Symbols", NULL},
         {NULL}
     },
-    // Sessional 2 (Units 3, 4 & 5)
     {
-        // Unit 3: Trees
         {"Binary Tree", "Binary Search Tree", "Expression Tree", NULL},
-        // Unit 4: Hashing, Searching and Sorting
         {"Hash Table (Insert/Delete)", "Linear Search", "Binary Search", "Insertion Sort", "Quick Sort", "Merge Sort", "Heap Sort", NULL},
-        // Unit 5: Graphs
         {"Depth First Search (DFS)", "Breadth First Search (BFS)", "Dijkstra's Shortest Path", NULL}
     }
 };
 
-// --- Prototypes for internal menu functions ---
 void _display_main_menu();
 void _handle_sessional(int sessional_num);
 void _handle_unit_topics(int sessional_idx, int unit_rel_idx, const char *unit_name);
 void _dispatch_topic(const char *topic_name);
 
-// --- Main Program Entry ---
 int main() {
     int choice;
     _loading_animation();
@@ -40,9 +30,9 @@ int main() {
     do {
         _display_main_menu();
         if (scanf("%d", &choice) != 1) {
-            choice = -1; // Invalid choice
+            choice = -1;
         }
-        clear_input_buffer(); // Clear the \n from scanf
+        clear_input_buffer();
 
         switch (choice) {
             case 1:
@@ -61,8 +51,6 @@ int main() {
 
     return 0;
 }
-
-// --- Menu Functions ---
 
 void _display_main_menu() {
     _clear_screen();
@@ -169,12 +157,8 @@ void _handle_unit_topics(int sessional_idx, int unit_rel_idx, const char *unit_n
     } while (1);
 }
 
-/**
- * @brief This is the new, clean dispatcher. It calls functions from other files.
- */
 void _dispatch_topic(const char *topic_name) {
     
-    // --- Unit 1 Calls ---
     if (strcmp(topic_name, "Array Max/Min") == 0) {
         dsa_array_max_min();
     } else if (strcmp(topic_name, "Single Linked List (All Ops)") == 0) {
@@ -189,7 +173,6 @@ void _dispatch_topic(const char *topic_name) {
         dsa_poly_add_sub();
     } 
     
-    // --- Unit 2 Calls ---
     else if (strcmp(topic_name, "Count Sort and Radix Sort") == 0) {
         dsa_count_radix_sort();
     } else if (strcmp(topic_name, "Stack Operations") == 0) {
@@ -206,7 +189,6 @@ void _dispatch_topic(const char *topic_name) {
         dsa_balancing_symbols();
     } 
     
-    // --- Unit 3 Calls ---
     else if (strcmp(topic_name, "Binary Tree") == 0) {
         dsa_binary_tree();
     } else if (strcmp(topic_name, "Binary Search Tree") == 0) {
@@ -215,7 +197,6 @@ void _dispatch_topic(const char *topic_name) {
         dsa_expression_tree();
     } 
     
-    // --- Unit 4 Calls ---
     else if (strcmp(topic_name, "Hash Table (Insert/Delete)") == 0) {
         dsa_hash_table();
     } else if (strcmp(topic_name, "Linear Search") == 0) {
@@ -232,7 +213,6 @@ void _dispatch_topic(const char *topic_name) {
         dsa_heap_sort();
     } 
     
-    // --- Unit 5 Calls ---
     else if (strcmp(topic_name, "Depth First Search (DFS)") == 0) {
         dsa_dfs();
     } else if (strcmp(topic_name, "Breadth First Search (BFS)") == 0) {
@@ -241,7 +221,6 @@ void _dispatch_topic(const char *topic_name) {
         dsa_dijkstra();
     }
     
-    // --- Default ---
     else {
         _display_content_placeholder(topic_name);
     }
