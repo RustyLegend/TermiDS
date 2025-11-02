@@ -129,14 +129,13 @@ static void bfs_print_queue() {
 // (This code goes into dsa_unit5_graphs.c)
 
 /**
- * @brief (BFS) The main BFS traversal function (CORRECTED).
+ * @brief (BFS) The main BFS traversal function (ONLY for the connected component).
  */
-// (This code goes into dsa_unit5_graphs.c)
 static void bfs_run_traversal() {
     int start_vertex;
-    // <<< NEW: Buffer to store the final traversal order >>>
-    char traversal_order[MAX_GRAPH_VERTICES * 5 + 10]; // Rough estimate for size
-    
+    // Buffer to store the final traversal order
+    char traversal_order[MAX_GRAPH_VERTICES * 5 + 10]; 
+
     printf("Enter start vertex for BFS (0 to %d): ", g_graph.V - 1);
     if(scanf("%d", &start_vertex) != 1 || start_vertex < 0 || start_vertex >= g_graph.V) {
         printf("Invalid start vertex.\n"); clear_input_buffer(); return;
@@ -145,16 +144,15 @@ static void bfs_run_traversal() {
 
     // 1. Reset visited array and initialize queue
     for (int i = 0; i < g_graph.V; i++) {
-        g_visited[i] = 0; 
+        g_visited[i] = 0; // Reuse the visited array
     }
     bfs_queue_init();
 
     printf("\n--- BFS Traversal Steps ---\n");
-    // <<< NEW: Initialize the traversal order string >>>
+    // Initialize the traversal order string
     strcpy(traversal_order, "Start"); 
 
     // --- Start BFS from the initial vertex ---
-    // <<< NEW: Append start node to the string >>>
     sprintf(traversal_order + strlen(traversal_order), " -> %d", start_vertex); 
     
     printf("Visited: %d\n", start_vertex); // Print visit step
@@ -169,8 +167,7 @@ static void bfs_run_traversal() {
         printf("\nDequeued: %d. Exploring neighbors...\n", u);
 
         for (int v = 0; v < g_graph.V; v++) {
-            if (g_graph.adjMatrix[u][v] != 0 && g_visited[v] == 0) { // Check weight > 0
-                // <<< NEW: Append visited node to the string >>>
+            if (g_graph.adjMatrix[u][v] == 1 && g_visited[v] == 0) { // Check for == 1
                 sprintf(traversal_order + strlen(traversal_order), " -> %d", v); 
                 
                 printf("  Visited: %d\n", v); // Print visit step
@@ -180,44 +177,15 @@ static void bfs_run_traversal() {
             }
         }
     }
-    printf("\n--- Main Traversal Complete ---\n");
+    printf("\n--- Traversal Complete ---\n");
 
 
-    // --- Check for disconnected components ---
-    for (int i = 0; i < g_graph.V; i++) {
-        if (g_visited[i] == 0) {
-            printf("\nNote: Vertex %d was unreached. Starting BFS from %d...\n", i, i);
-            // <<< NEW: Append disconnected node >>>
-            sprintf(traversal_order + strlen(traversal_order), " -> %d", i); 
-            
-            printf("Visited: %d\n", i); // Print visit step
-            g_visited[i] = 1;
-            bfs_enqueue(i);
-            bfs_print_queue();
+    // --- Disconnected component check has been REMOVED ---
+    
+    
+    printf("\n--- Traversal for this component finished ---\n");
 
-            // Run BFS for the disconnected component
-            while (!bfs_queue_is_empty()) {
-                int u = bfs_dequeue();
-                 printf("\nDequeued: %d. Exploring neighbors...\n", u);
-
-                for (int v = 0; v < g_graph.V; v++) {
-                     if (g_graph.adjMatrix[u][v] != 0 && g_visited[v] == 0) { // Check weight > 0
-                         // <<< NEW: Append visited node >>>
-                         sprintf(traversal_order + strlen(traversal_order), " -> %d", v); 
-
-                         printf("  Visited: %d\n", v); // Print visit step
-                         g_visited[v] = 1;
-                         bfs_enqueue(v);
-                         bfs_print_queue();
-                     }
-                 }
-            }
-             printf("\n--- Disconnected Component Traversal Complete ---\n");
-        }
-    }
-    printf("\n--- All Components Traversed ---\n");
-
-    // <<< NEW: Print the final accumulated traversal order >>>
+    // Print the final accumulated traversal order
     printf("\nFinal Traversal Order:\n%s\n", traversal_order); 
 }
 
@@ -355,7 +323,7 @@ static void dijkstra_run() {
  * @brief (GRAPH) Initializes the graph for weighted edges.
  * Asks user for V and sets all matrix entries to 0 (no edge).
  */
-static void graph_init() {
+static void graph_init(int is_weighted) {
     int v_num = 0;
     while (v_num <= 0 || v_num > MAX_GRAPH_VERTICES) {
         printf("Enter number of vertices (1 to %d): ", MAX_GRAPH_VERTICES);
@@ -363,20 +331,81 @@ static void graph_init() {
         clear_input_buffer();
     }
     g_graph.V = v_num;
-
+    g_graph.is_weighted = is_weighted;
     // Initialize adjacency matrix to all 0s (no edges)
     for (int i = 0; i < g_graph.V; i++) {
         for (int j = 0; j < g_graph.V; j++) {
             g_graph.adjMatrix[i][j] = 0; // 0 now means no direct edge
         }
     }
-    printf("Created a weighted graph with %d vertices (0 to %d).\n", g_graph.V, g_graph.V - 1);
+    if (is_weighted) {
+        printf("Created a new WEIGHTED graph with %d vertices (0 to %d).\n", g_graph.V, g_graph.V - 1);
+    } else {
+        printf("Created a new UNWEIGHTED graph with %d vertices (0 to %d).\n", g_graph.V, g_graph.V - 1);
+    }
+}
+
+// (This is in dsa_unit5_graphs.c)
+
+/**
+ * @brief (GRAPH) Gatekeeper function to ask user if they want to use
+ * the existing graph or create a new one.
+ * @param needs_weighted 0 for unweighted (DFS/BFS), 1 for weighted (Dijkstra)
+ */
+static void graph_confirm_or_create(int needs_weighted) {
+    // Check if a graph exists
+    if (g_graph.V > 0 && g_graph.V <= MAX_GRAPH_VERTICES) {
+        _clear_screen();
+        printf("==========================================\n");
+        printf("| Existing Graph Found                    |\n");
+        printf("==========================================\n");
+        printf("A graph with %d vertices already exists.\n", g_graph.V);
+
+        // Check for type mismatch and warn the user
+        if (g_graph.is_weighted && !needs_weighted) {
+            printf("\nWARNING: This existing graph is WEIGHTED.\n");
+            printf("You are entering an UNWEIGHTED module (DFS/BFS).\n");
+            printf("This may fail if edges are not 1.\n");
+        } else if (!g_graph.is_weighted && needs_weighted) {
+            printf("\nWARNING: This existing graph is UNWEIGHTED.\n");
+            printf("You are entering a WEIGHTED module (Dijkstra).\n");
+            printf("Weights will be treated as 1.\n");
+        }
+
+        printf("------------------------------------------\n");
+        printf(" 1. Use existing graph\n");
+        printf(" 2. Create a new graph (discards old one)\n");
+        printf("------------------------------------------\n");
+        printf("Enter your choice: ");
+
+        int choice;
+        if (scanf("%d", &choice) != 1) { choice = -1; }
+        clear_input_buffer();
+
+        if (choice == 2) {
+            printf("Creating a new graph...\n");
+            graph_init(needs_weighted); // Create new
+        } else {
+            printf("Using existing graph.\n");
+            // If type doesn't match, set it, but this is risky
+            if (g_graph.is_weighted != needs_weighted) {
+                 printf("Warning: Mismatched graph type. Results may be incorrect.\n");
+                 g_graph.is_weighted = needs_weighted; // Force type for add_edge functions
+            }
+        }
+
+    } else {
+        // No graph exists or it's invalid, must create one
+        printf("No valid graph found. Creating a new one...\n");
+        graph_init(needs_weighted);
+    }
+    _press_enter_to_continue();
 }
 
 /**
  * @brief (GRAPH) Adds a weighted, undirected edge between two vertices.
  */
-static void graph_add_edge() {
+static void graph_add_edge_weighted() {
     int src, dest, weight;
     printf("Enter source vertex (0 to %d): ", g_graph.V - 1);
     if(scanf("%d", &src) != 1 || src < 0 || src >= g_graph.V) {
@@ -406,6 +435,51 @@ static void graph_add_edge() {
     g_graph.adjMatrix[src][dest] = weight;
     g_graph.adjMatrix[dest][src] = weight;
     printf("Added undirected edge between %d and %d with weight %d.\n", src, dest, weight);
+}
+
+// (in dsa_unit5_graphs.c)
+
+/**
+ * @brief (GRAPH) Adds an UNWEIGHTED (weight=1) edge.
+ * Rejects weights other than 1 as requested.
+ */
+static void graph_add_edge_unweighted() {
+    int src, dest, weight;
+    printf("Enter source vertex (0 to %d): ", g_graph.V - 1);
+    if(scanf("%d", &src) != 1 || src < 0 || src >= g_graph.V) {
+        printf("Invalid source.\n"); clear_input_buffer(); return;
+    }
+    clear_input_buffer();
+
+    printf("Enter destination vertex (0 to %d): ", g_graph.V - 1);
+    if(scanf("%d", &dest) != 1 || dest < 0 || dest >= g_graph.V) {
+        printf("Invalid destination.\n"); clear_input_buffer(); return;
+    }
+    clear_input_buffer();
+
+    // --- THIS IS THE NEW LOGIC ---
+    printf("Enter weight for edge %d <-> %d (must be 1 for unweighted): ", src, dest);
+    if(scanf("%d", &weight) != 1) {
+        printf("Invalid input.\n"); clear_input_buffer(); return;
+    }
+    clear_input_buffer();
+
+    if (weight != 1) {
+        printf("\nError: Weight must be 1 for unweighted graphs (DFS/BFS).\n");
+        printf("Edge not added. Please use a weight of 1.\n");
+        return;
+    }
+    // --- END NEW LOGIC ---
+
+    if (src == dest) {
+        printf("Self-loops are not allowed.\n");
+        return;
+    }
+
+    // Add unweighted (weight=1) undirected edge
+    g_graph.adjMatrix[src][dest] = 1;
+    g_graph.adjMatrix[dest][src] = 1;
+    printf("Added unweighted edge between %d and %d.\n", src, dest);
 }
 
 /**
@@ -456,13 +530,13 @@ static void dfs_recursive(int v) { // Removed depth parameter
     // 2. Recurse for all adjacent, unvisited vertices
     for (int i = 0; i < g_graph.V; i++) {
         // If vertex 'i' is adjacent to 'v' AND 'i' has not been visited
-        if (g_graph.adjMatrix[v][i] != 0 && g_visited[i] == 0) {
+        if (g_graph.adjMatrix[v][i] == 1 && g_visited[i] == 0) {
             printf("  DFS(%d): Found unvisited neighbor %d. Calling DFS(%d).\n", v, i, i);
             dfs_recursive(i); // <<< RECURSIVE CALL
             // --- Visualization: Returning from recursive call ---
             printf("\nReturning to DFS(%d) from DFS(%d):\n", v, i);
             dfs_vis_print_stack(); // Show stack after child returns
-        } else if (g_graph.adjMatrix[v][i] != 0 && g_visited[i] != 0) {
+        } else if (g_graph.adjMatrix[v][i] == 1 && g_visited[i] != 0) {
              printf("  DFS(%d): Neighbor %d already visited. Skipping.\n", v, i);
         }
     }
@@ -479,8 +553,10 @@ static void dfs_recursive(int v) { // Removed depth parameter
  */
 // (This code goes into dsa_unit5_graphs.c)
 
+// (This code goes into dsa_unit5_graphs.c)
+
 /**
- * @brief (DFS) Wrapper to start the traversal with stack visualization.
+ * @brief (DFS) Wrapper to start the traversal (ONLY for the connected component).
  */
 static void dfs_run_traversal() {
     int start_vertex;
@@ -491,41 +567,26 @@ static void dfs_run_traversal() {
     }
     clear_input_buffer();
 
-    // 1. Reset visited array and VISUALIZATION stack
+    // 1. Reset visited array, VISUALIZATION stack, and traversal string
     for (int i = 0; i < g_graph.V; i++) {
         g_visited[i] = 0;
     }
-    dfs_vis_stack_init(); // <<< Initialize the viz stack
-    strcpy(g_dfs_traversal_order, "Start");
+    dfs_vis_stack_init();
+    strcpy(g_dfs_traversal_order, "Start"); // Initialize the string
 
     printf("\n--- DFS Call Stack Visualization ---\n");
-    printf("(Traversal Order will be printed in the end)\n");
+    printf("(Traversal Order will be printed at the end)\n");
+
+
+    // 2. Call the recursive helper ONCE for the start vertex
     dfs_recursive(start_vertex);
 
-    // --- Traversal Complete ---
-    printf("\n\n--- Main Traversal from start node Complete ---\n");
-    // (Actual traversal order string construction would ideally happen here)
-    // Example (requires modifying dfs_recursive to populate a string):
-    // printf("Final Traversal Order: %s\n", traversal_order_string);
 
+    printf("\n\n--- Traversal from start node Complete ---\n");
 
-    // 3. Check for disconnected components
-    printf("\n--- Checking for Disconnected Components ---\n");
-    int found_disconnected = 0;
-    for (int i = 0; i < g_graph.V; i++) {
-        if (g_visited[i] == 0) {
-            found_disconnected = 1;
-            printf("\nNote: Vertex %d was unreached.\n", i);
-            printf("Starting DFS from %d...\n", i);
-            dfs_vis_stack_init(); // Re-init stack for this component
-            dfs_recursive(i);
-            printf("\n--- Disconnected Component Traversal Complete ---\n");
-        }
-    }
-    if (!found_disconnected) {
-        printf("No disconnected components found.\n");
-    }
-    printf("\n--- All Components Traversed ---\n");
+    // 3. Disconnected component check has been REMOVED
+    //    We will now just print the final order for the
+    //    component we traversed.
 
     printf("\nFinal Traversal Order:\n%s\n", g_dfs_traversal_order);
 }
@@ -538,13 +599,7 @@ static void dfs_run_traversal() {
 void dsa_dfs() {
     int choice;
     
-    // 1. Initialize the graph first
-    _clear_screen();
-    printf("==========================================\n");
-    printf("| Depth First Search (DFS) Setup          |\n");
-    printf("==========================================\n");
-    graph_init();
-    _press_enter_to_continue();
+    graph_confirm_or_create(0);
 
 
     // 2. Main menu
@@ -566,7 +621,7 @@ void dsa_dfs() {
 
         switch (choice) {
             case 1:
-                graph_add_edge();
+                graph_add_edge_unweighted();
                 _press_enter_to_continue();
                 break;
             case 2:
@@ -594,23 +649,7 @@ void dsa_dfs() {
 void dsa_bfs() {
     int choice;
     
-    // 1. Initialize the graph first
-    _clear_screen();
-    printf("==========================================\n");
-    printf("| Breadth First Search (BFS) Setup        |\n");
-    printf("==========================================\n");
-    // Reuse the same init as DFS
-    // IMPORTANT: If you just ran DFS, the graph is already set up.
-    // We might want a way to reset it, but for now we'll reuse.
-    if (g_graph.V <= 0 || g_graph.V > MAX_GRAPH_VERTICES) {
-        printf("Graph not initialized or invalid. Initializing...\n");
-         graph_init(); // Initialize if not already done
-         _press_enter_to_continue();
-    } else {
-        printf("Using the graph previously defined (Vertices: %d).\n", g_graph.V);
-        printf("You can add more edges if needed.\n");
-        _press_enter_to_continue();
-    }
+    graph_confirm_or_create(0);
 
     // 2. Main menu
     do {
@@ -631,7 +670,7 @@ void dsa_bfs() {
 
         switch (choice) {
             case 1:
-                graph_add_edge();
+                graph_add_edge_unweighted();
                 _press_enter_to_continue();
                 break;
             case 2:
@@ -658,20 +697,7 @@ void dsa_bfs() {
 void dsa_dijkstra() {
     int choice;
 
-    // 1. Initialize/Confirm Graph Setup
-    _clear_screen();
-    printf("==========================================\n");
-    printf("| Dijkstra's Algorithm Setup              |\n");
-    printf("==========================================\n");
-    if (g_graph.V <= 0 || g_graph.V > MAX_GRAPH_VERTICES) {
-        printf("Graph not initialized or invalid. Initializing...\n");
-         graph_init(); // Requires weights now
-         _press_enter_to_continue();
-    } else {
-        printf("Using the weighted graph previously defined (Vertices: %d).\n", g_graph.V);
-        printf("Ensure edges have weights > 0.\n");
-        _press_enter_to_continue();
-    }
+    graph_confirm_or_create(1);
 
     // 2. Main menu
     do {
@@ -692,7 +718,7 @@ void dsa_dijkstra() {
 
         switch (choice) {
             case 1:
-                graph_add_edge(); // Now adds weighted edges
+                graph_add_edge_weighted(); // Now adds weighted edges
                 _press_enter_to_continue();
                 break;
             case 2:

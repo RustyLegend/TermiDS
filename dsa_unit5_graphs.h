@@ -16,6 +16,7 @@ void dsa_dijkstra();
 struct Graph {
     int V; // Number of vertices
     int adjMatrix[MAX_GRAPH_VERTICES][MAX_GRAPH_VERTICES];
+    int is_weighted;
 };
 
 #endif // DSA_UNIT5_GRAPHS_H
