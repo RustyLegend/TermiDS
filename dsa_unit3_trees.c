@@ -259,11 +259,18 @@ void dsa_bst_operations() {
         printf("==========================================\n");
         printf("| Binary Search Tree (BST) Operations     |\n");
         printf("==========================================\n");
-        printf(" 1. Insert Node\n");
-        printf(" 2. Display Inorder (Sorted)\n");
+        if (root == NULL) {
+            printf("Tree is currently empty.\n");
+        } else {
+            printf("Tree has been built. Use display options.\n");
+        }
+        printf("------------------------------------------\n");
+        printf(" 1. Insert Node (Auto-sorts)\n");
+        printf(" 2. Display Inorder (Sorted List)\n");
         printf(" 3. Display Preorder\n");
         printf(" 4. Display Postorder\n");
-        printf(" 5. Back to Topics Menu\n");
+        printf(" 5. Display Tree (2D Visualization)\n");
+        printf(" 6. Back to Topics Menu\n");
         printf("------------------------------------------\n");
         printf("Enter your choice: ");
 
@@ -280,27 +287,33 @@ void dsa_bst_operations() {
                 _press_enter_to_continue();
                 break;
             case 2:
-                printf("Inorder Traversal (LNR): ");
-                bst_inorder_traversal(root);
-                if(root == NULL) printf("Tree is empty.");
+                _clear_screen();
+                printf("--- Inorder Traversal (LNR) ---\n");
+                if(root) bst_inorder_traversal(root); else printf("Tree is empty.");
                 printf("\n");
                 _press_enter_to_continue();
                 break;
             case 3:
-                printf("Preorder Traversal (NLR): ");
-                bst_preorder_traversal(root);
-                if(root == NULL) printf("Tree is empty.");
+                _clear_screen();
+                printf("--- Preorder Traversal (NLR) ---\n");
+                if(root) bst_preorder_traversal(root); else printf("Tree is empty.");
                 printf("\n");
                 _press_enter_to_continue();
                 break;
             case 4:
-                printf("Postorder Traversal (LRN): ");
-                bst_postorder_traversal(root);
-                if(root == NULL) printf("Tree is empty.");
+                _clear_screen();
+                printf("--- Postorder Traversal (LRN) ---\n");
+                if(root) bst_postorder_traversal(root); else printf("Tree is empty.");
                 printf("\n");
                 _press_enter_to_continue();
                 break;
+            
             case 5:
+                g_tree_print_ascii(root); 
+                _press_enter_to_continue();
+                break;
+            
+            case 6:
                 root = g_tree_free(root);
                 printf("BST memory freed.\n");
                 return;
@@ -308,7 +321,7 @@ void dsa_bst_operations() {
                 printf("Invalid choice.\n");
                 _press_enter_to_continue();
         }
-    } while (choice != 5);
+    } while (choice != 6);
 }
 
 #define ET_STACK_SIZE 100
